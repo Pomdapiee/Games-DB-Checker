@@ -3,7 +3,7 @@ from discord.ext import commands, tasks
 import requests
 import json
 import asyncio
-from datetime import datetime, time
+from datetime import datetime
 import pytz
 import os
 from dotenv import load_dotenv
@@ -144,7 +144,7 @@ async def on_ready():
     else:
         print("[DEBUG] La tâche check_database est déjà en cours")
 
-@tasks.loop(time=time(hour=8, minute=0, tzinfo=pytz.utc))  # 8h UTC = 10h Paris en été
+@tasks.loop(minutes=10)  # Vérification toutes les 10 minutes
 async def check_database():
     print(f"[{datetime.now(pytz.utc)}] [DEBUG] check_database exécuté (heure UTC)")
     print(f"[{datetime.now(FRENCH_TZ)}] [DEBUG] check_database exécuté (heure Paris)")
@@ -191,7 +191,7 @@ async def status(ctx):
         value=f"{len(known_games)} | {'🟢 Actif' if check_database.is_running() else '🔴 Inactif'}",
         inline=False
     )
-    embed.add_field(name="Prochaine vérification", value="Tous les jours à 10h00 (heure française)", inline=False)
+    embed.add_field(name="Fréquence de vérification", value="Toutes les 10 minutes", inline=False)
 
     # Ajouter info sur la persistance
     persistence_status = "🟢 Actif" if os.path.exists(KNOWN_GAMES_FILE) else "🟡 Pas de fichier"
